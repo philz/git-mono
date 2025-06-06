@@ -42,7 +42,7 @@ func handleReset(args []string) error {
 	}
 
 	// Get the previous base commit
-	prevBase, err := gitOutput("config", "mono.init-commit")
+	prevBase, err := gitOutput("config", "stitch.init-commit")
 	if err != nil {
 		return fmt.Errorf("failed to get previous base commit: %v", err)
 	}

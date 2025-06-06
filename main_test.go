@@ -67,26 +67,26 @@ func TestGitMonoWorkflow(t *testing.T) {
 		}
 
 		// Verify config was stored in remote sections
-		remotes, err := gitOutput("config", "mono.remotes")
+		remotes, err := gitOutput("config", "stitch.remotes")
 		if err != nil {
-			t.Fatalf("Failed to get mono.remotes: %v", err)
+			t.Fatalf("Failed to get stitch.remotes: %v", err)
 		}
 		if !strings.Contains(remotes, "a-remote") || !strings.Contains(remotes, "b-remote") {
-			t.Errorf("Expected mono.remotes to contain both remotes, got %s", strings.TrimSpace(remotes))
+			t.Errorf("Expected stitch.remotes to contain both remotes, got %s", strings.TrimSpace(remotes))
 		}
 
 		// Verify remote-specific config was stored
-		branch, err := gitOutput("config", "remote.a-remote.mono-branch")
+		branch, err := gitOutput("config", "remote.a-remote.stitch-branch")
 		if err != nil {
-			t.Fatalf("Failed to get remote.a-remote.mono-branch: %v", err)
+			t.Fatalf("Failed to get remote.a-remote.stitch-branch: %v", err)
 		}
 		if strings.TrimSpace(branch) != "master" {
 			t.Errorf("Expected master, got %s", strings.TrimSpace(branch))
 		}
 
-		dir, err := gitOutput("config", "remote.a-remote.mono-dir")
+		dir, err := gitOutput("config", "remote.a-remote.stitch-dir")
 		if err != nil {
-			t.Fatalf("Failed to get remote.a-remote.mono-dir: %v", err)
+			t.Fatalf("Failed to get remote.a-remote.stitch-dir: %v", err)
 		}
 		if strings.TrimSpace(dir) != "a-remote" {
 			t.Errorf("Expected a-remote, got %s", strings.TrimSpace(dir))
@@ -96,7 +96,7 @@ func TestGitMonoWorkflow(t *testing.T) {
 	// Test rebase command
 	t.Run("rebase", func(t *testing.T) {
 		// First, check out the monorepo commit
-		initCommit, err := gitOutput("config", "mono.init-commit")
+		initCommit, err := gitOutput("config", "stitch.init-commit")
 		if err != nil {
 			t.Fatalf("Failed to get init commit: %v", err)
 		}
@@ -111,7 +111,7 @@ func TestGitMonoWorkflow(t *testing.T) {
 		}
 
 		// Verify new base commit was created and stored
-		newInitCommit, err := gitOutput("config", "mono.init-commit")
+		newInitCommit, err := gitOutput("config", "stitch.init-commit")
 		if err != nil {
 			t.Fatalf("Failed to get new init commit: %v", err)
 		}

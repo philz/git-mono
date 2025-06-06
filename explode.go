@@ -26,7 +26,7 @@ func handleExplode(args []string) error {
 	}
 
 	// Get the base commit from config
-	initCommit, err := gitOutput("config", "mono.init-commit")
+	initCommit, err := gitOutput("config", "stitch.init-commit")
 	if err != nil {
 		return fmt.Errorf("failed to get base commit from config: %v", err)
 	}
@@ -107,8 +107,8 @@ func explodeCommitToRemote(commit string, spec RemoteSpec) error {
 	}
 	treeHash = strings.TrimSpace(treeHash)
 
-	// Get the commit message
-	commitMsg, err := gitOutput("log", "-1", "--pretty=format:%s", commit)
+	// Get the full commit message (subject + body)
+	commitMsg, err := gitOutput("log", "-1", "--pretty=format:%B", commit)
 	if err != nil {
 		return err
 	}

@@ -33,7 +33,7 @@ func handleRebase(args []string) error {
 	}
 
 	// Get the previous base commit
-	prevBase, err := gitOutput("config", "mono.init-commit")
+	prevBase, err := gitOutput("config", "stitch.init-commit")
 	if err != nil {
 		return fmt.Errorf("failed to get previous base commit: %v", err)
 	}
@@ -148,8 +148,8 @@ func handleRebase(args []string) error {
 	}
 	newBaseCommit = strings.TrimSpace(newBaseCommit)
 
-	// Update the mono.init-commit config
-	runGit("config", "mono.init-commit", newBaseCommit)
+	// Update the stitch.init-commit config
+	runGit("config", "stitch.init-commit", newBaseCommit)
 
 	fmt.Printf("Created new base commit: %s\n", newBaseCommit)
 	fmt.Printf("Previous base: %s\n", prevBase)
@@ -173,8 +173,8 @@ func handleRebase(args []string) error {
 }
 
 func loadRemoteSpecs() ([]RemoteSpec, error) {
-	// Get list of remotes from mono.remotes
-	remotesStr, err := gitOutput("config", "mono.remotes")
+	// Get list of remotes from stitch.remotes
+	remotesStr, err := gitOutput("config", "stitch.remotes")
 	if err != nil {
 		return nil, err
 	}
@@ -188,19 +188,19 @@ func loadRemoteSpecs() ([]RemoteSpec, error) {
 	for _, remoteName := range remoteNames {
 		prefix := fmt.Sprintf("remote.%s", remoteName)
 
-		branch, err := gitOutput("config", prefix+".mono-branch")
+		branch, err := gitOutput("config", prefix+".stitch-branch")
 		if err != nil {
-			return nil, fmt.Errorf("missing config %s.mono-branch", prefix)
+			return nil, fmt.Errorf("missing config %s.stitch-branch", prefix)
 		}
 
-		subdir, err := gitOutput("config", prefix+".mono-subdir")
+		subdir, err := gitOutput("config", prefix+".stitch-subdir")
 		if err != nil {
-			return nil, fmt.Errorf("missing config %s.mono-subdir", prefix)
+			return nil, fmt.Errorf("missing config %s.stitch-subdir", prefix)
 		}
 
-		dir, err := gitOutput("config", prefix+".mono-dir")
+		dir, err := gitOutput("config", prefix+".stitch-dir")
 		if err != nil {
-			return nil, fmt.Errorf("missing config %s.mono-dir", prefix)
+			return nil, fmt.Errorf("missing config %s.stitch-dir", prefix)
 		}
 
 		remotes = append(remotes, RemoteSpec{

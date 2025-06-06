@@ -111,9 +111,9 @@ func handleInit(args []string) error {
 	// Store configuration in remote sections
 	for _, remote := range remotes {
 		prefix := fmt.Sprintf("remote.%s", remote.Remote)
-		runGit("config", prefix+".mono-branch", remote.Branch)
-		runGit("config", prefix+".mono-subdir", remote.Subdir)
-		runGit("config", prefix+".mono-dir", remote.Dir)
+		runGit("config", prefix+".stitch-branch", remote.Branch)
+		runGit("config", prefix+".stitch-subdir", remote.Subdir)
+		runGit("config", prefix+".stitch-dir", remote.Dir)
 	}
 
 	// Store global mono config
@@ -121,8 +121,8 @@ func handleInit(args []string) error {
 	for i, remote := range remotes {
 		remoteNames[i] = remote.Remote
 	}
-	runGit("config", "mono.remotes", strings.Join(remoteNames, " "))
-	runGit("config", "mono.init-commit", commitHash)
+	runGit("config", "stitch.remotes", strings.Join(remoteNames, " "))
+	runGit("config", "stitch.init-commit", commitHash)
 
 	fmt.Printf("Created monorepo commit: %s\n", commitHash)
 	fmt.Printf("\nTo check out the new commit, run:\n")

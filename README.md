@@ -35,7 +35,7 @@ Creates the initial monorepo commit by:
 1. Fetching specified remotes and detecting their default branches
 2. Building a synthetic tree with each remote's content in its own subdirectory
 3. Creating a merge commit with all remote HEAD commits as parents
-4. Storing configuration in `remote.<name>.mono-*` git config keys
+4. Storing configuration in `remote.<name>.stitch-*` git config keys
 
 ### Rebase
 Updates the monorepo base by:
@@ -137,13 +137,13 @@ Monorepo configuration is stored in git config:
 
 ```bash
 # Global settings
-mono.remotes=repo1 repo2
-mono.init-commit=<hash>
+stitch.remotes=repo1 repo2
+stitch.init-commit=<hash>
 
 # Per-remote settings  
-remote.repo1.mono-branch=main
-remote.repo1.mono-subdir=.
-remote.repo1.mono-dir=repo1
+remote.repo1.stitch-branch=main
+remote.repo1.stitch-subdir=.
+remote.repo1.stitch-dir=repo1
 ```
 
 ### Tips
