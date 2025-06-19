@@ -124,10 +124,10 @@ func main() {
 	// Create the commit with deterministic timestamp and author
 	cmd = exec.Command("git", commitArgs...)
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("GIT_AUTHOR_NAME=git-stitch"),
-		fmt.Sprintf("GIT_AUTHOR_EMAIL=git-stitch@localhost"),
-		fmt.Sprintf("GIT_COMMITTER_NAME=git-stitch"),
-		fmt.Sprintf("GIT_COMMITTER_EMAIL=git-stitch@localhost"),
+		"GIT_AUTHOR_NAME=git-stitch",
+		"GIT_AUTHOR_EMAIL=git-stitch@localhost",
+		"GIT_COMMITTER_NAME=git-stitch",
+		"GIT_COMMITTER_EMAIL=git-stitch@localhost",
 		fmt.Sprintf("GIT_AUTHOR_DATE=%d", maxTimestamp),
 		fmt.Sprintf("GIT_COMMITTER_DATE=%d", maxTimestamp),
 	)
