@@ -1,0 +1,25 @@
+Build the git-stitch and git-rip tools described in the README. Read the
+README.md as well as https://blog.philz.dev/blog/git-monorepo/ for how to do
+so. 
+
+When I run "git-stitch remote1/main remote2/main", it should create a commit
+that pulls in the ^{tree} of remote1/main and places it in remote1 and
+likewise for the second remote, and so forth. When "git-rip" is run, it should
+take all the commits since the initial commit, and replay them onto the original
+commits that constituted the merge. It should do so with plumbing commands based
+on the trees.
+
+Write this all in Go, shelling out to git for the most part.
+
+When we do the "rip", leave the commit messages alone; don't indicate that they came from the monorepo tool.
+
+It would be nice for things to be as determinstic as possible. When we're
+creating commits, let's explicltly set the date to the max of the constituent
+commit dates, configure the author explicitly to be git-stitch, etc.
+Because it's deterministic, we should be able to make the README work "for real".
+The repos mentioned are public, so you can use https:// instead of ssh:// if that
+works better.
+
+There shouldn't be a makefile; go build should be more than enough.
+
+Your commit should have a brief and to the point commit message.
