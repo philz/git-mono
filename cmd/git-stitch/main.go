@@ -42,6 +42,13 @@ func main() {
 		remote := parts[0]
 		_ = parts[1] // branch name, used in ref but not needed separately
 
+		// Check if remote exists
+		cmd := exec.Command("git", "remote", "get-url", remote)
+		if err := cmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: remote '%s' does not exist\n", remote)
+			os.Exit(1)
+		}
+
 		if !noFetch {
 			fmt.Printf("Fetching %s... ", remote)
 			cmd := exec.Command("git", "fetch", remote)
@@ -52,7 +59,7 @@ func main() {
 		}
 
 		// Get the commit hash
-		cmd := exec.Command("git", "rev-parse", ref)
+		cmd = exec.Command("git", "rev-parse", ref)
 		output, err := cmd.Output()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error getting commit for %s: %v\n", ref, err)
@@ -113,7 +120,7 @@ func main() {
 	treeHash := strings.TrimSpace(string(output))
 
 	// Prepare commit arguments
-	commitArgs := []string{"commit-tree", treeHash, "-m", "Monorepo merge"}
+	commitArgs := []string{"commit-tree", treeHash, "-m", "git-stitch merge"}
 
 	// Add parent commits (sorted for determinism)
 	for _, remote := range remotes {

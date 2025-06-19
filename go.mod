@@ -1,3 +1,3 @@
-module github.com/philz/git-mono
+module github.com/philz/git-stitch
 
 go 1.24.3

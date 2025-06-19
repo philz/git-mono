@@ -12,11 +12,14 @@ import (
 )
 
 type CommitInfo struct {
-	Hash      string
-	Message   string
-	Author    string
-	Email     string
-	Timestamp int64
+	Hash               string
+	Message            string
+	AuthorName         string
+	AuthorEmail        string
+	AuthorTimestamp    int64
+	CommitterName      string
+	CommitterEmail     string
+	CommitterTimestamp int64
 }
 
 func main() {
@@ -124,62 +127,78 @@ func main() {
 }
 
 func findBaseMergeCommit() (string, error) {
-	cmd := exec.Command("git", "log", "--grep=Monorepo merge", "--format=%H", "-1")
+	cmd := exec.Command("git", "log", "--grep=git-stitch merge", "--format=%H", "-1")
 	output, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
 	commitHash := strings.TrimSpace(string(output))
 	if commitHash == "" {
-		return "", fmt.Errorf("no merge commit found with message 'Monorepo merge'")
+		return "", fmt.Errorf("no merge commit found with message 'git-stitch merge'")
 	}
 	return commitHash, nil
 }
 
 func getCommitsSince(baseCommit string) ([]CommitInfo, error) {
+	// Use a simpler approach: get hashes first, then get details
 	cmd := exec.Command("git", "rev-list", "--reverse", fmt.Sprintf("%s..HEAD", baseCommit))
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	hashes := strings.Fields(string(output))
-	commits := make([]CommitInfo, len(hashes))
+	if len(output) == 0 {
+		return []CommitInfo{}, nil
+	}
 
-	for i, hash := range hashes {
+	hashes := strings.Fields(string(output))
+	commits := make([]CommitInfo, 0, len(hashes))
+
+	for _, hash := range hashes {
 		commit, err := getCommitInfo(hash)
 		if err != nil {
-			return nil, err
+			fmt.Fprintf(os.Stderr, "Warning: failed to get info for commit %s: %v\n", hash, err)
+			continue
 		}
-		commits[i] = commit
+		commits = append(commits, commit)
 	}
 
 	return commits, nil
 }
 
+// getCommitInfo is no longer needed since getCommitsSince does this all at once
+// but keeping it for compatibility in case it's used elsewhere
 func getCommitInfo(hash string) (CommitInfo, error) {
-	cmd := exec.Command("git", "show", "-s", "--format=%H%n%s%n%an%n%ae%n%ct", hash)
+	cmd := exec.Command("git", "show", "-s", "--format=%H%x00%B%x00%an%x00%ae%x00%at%x00%cn%x00%ce%x00%ct", hash)
 	output, err := cmd.Output()
 	if err != nil {
 		return CommitInfo{}, err
 	}
 
-	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
-	if len(lines) < 5 {
+	parts := strings.Split(strings.TrimSpace(string(output)), "\x00")
+	if len(parts) < 8 {
 		return CommitInfo{}, fmt.Errorf("unexpected git show output")
 	}
 
-	timestamp, err := strconv.ParseInt(lines[4], 10, 64)
+	authorTimestamp, err := strconv.ParseInt(parts[4], 10, 64)
+	if err != nil {
+		return CommitInfo{}, err
+	}
+
+	committerTimestamp, err := strconv.ParseInt(parts[7], 10, 64)
 	if err != nil {
 		return CommitInfo{}, err
 	}
 
 	return CommitInfo{
-		Hash:      lines[0],
-		Message:   lines[1],
-		Author:    lines[2],
-		Email:     lines[3],
-		Timestamp: timestamp,
+		Hash:               parts[0],
+		Message:            strings.TrimSpace(parts[1]),
+		AuthorName:         parts[2],
+		AuthorEmail:        parts[3],
+		AuthorTimestamp:    authorTimestamp,
+		CommitterName:      parts[5],
+		CommitterEmail:     parts[6],
+		CommitterTimestamp: committerTimestamp,
 	}, nil
 }
 
@@ -332,12 +351,12 @@ func createCommitForRemote(commit CommitInfo, remote string, files []string, par
 	// Create the commit
 	cmd = exec.Command("git", "commit-tree", newTree, "-p", parentCommit, "-m", commit.Message)
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("GIT_AUTHOR_NAME=%s", commit.Author),
-		fmt.Sprintf("GIT_AUTHOR_EMAIL=%s", commit.Email),
-		fmt.Sprintf("GIT_COMMITTER_NAME=%s", commit.Author),
-		fmt.Sprintf("GIT_COMMITTER_EMAIL=%s", commit.Email),
-		fmt.Sprintf("GIT_AUTHOR_DATE=%d", commit.Timestamp),
-		fmt.Sprintf("GIT_COMMITTER_DATE=%d", commit.Timestamp),
+		fmt.Sprintf("GIT_AUTHOR_NAME=%s", commit.AuthorName),
+		fmt.Sprintf("GIT_AUTHOR_EMAIL=%s", commit.AuthorEmail),
+		fmt.Sprintf("GIT_COMMITTER_NAME=%s", commit.CommitterName),
+		fmt.Sprintf("GIT_COMMITTER_EMAIL=%s", commit.CommitterEmail),
+		fmt.Sprintf("GIT_AUTHOR_DATE=%d", commit.AuthorTimestamp),
+		fmt.Sprintf("GIT_COMMITTER_DATE=%d", commit.CommitterTimestamp),
 	)
 
 	output, err = cmd.Output()
