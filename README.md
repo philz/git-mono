@@ -50,14 +50,7 @@ Branches created:
 go install github.com/philz/git-stitch/cmd/git-stitch github.com/philz/git-stitch/cmd/git-rip
 ```
 
-## Building from Source
 
-```bash
-go build ./cmd/git-stitch
-go build ./cmd/git-rip
-```
-
-Version information is automatically included using Go's build info.
 
 ## Usage
 
@@ -94,5 +87,72 @@ See https://blog.philz.dev/blog/git-monorepo/
 
 ## What does this look like visually?
 
-TODO: Insert mermaid diagrams here of the merged romeo and juliet from above
-as well as the generated split commits.
+### Option 1: Separate Diagrams
+
+#### 1. Initial git-stitch merge creates monorepo structure:
+```mermaid
+gitGraph
+    commit id: "romeo/main: a88073f"
+    branch juliet-main
+    checkout juliet-main
+    commit id: "juliet/main: 40840a7"
+    checkout main
+    merge juliet-main id: "git-stitch merge: 39202c3"
+```
+
+#### 2. Work done on the monorepo:
+```mermaid
+gitGraph
+    commit id: "romeo/main: a88073f"
+    branch juliet-main
+    checkout juliet-main
+    commit id: "juliet/main: 40840a7"
+    checkout main
+    merge juliet-main id: "git-stitch merge: 39202c3"
+    commit id: "Adding house metadata: fa6e575"
+    commit id: "Fixing typo: ab98164"
+```
+
+#### 3. Split back to Romeo repository (verona-romeo branch):
+```mermaid
+gitGraph
+    commit id: "Initial commit: a88073f"
+    commit id: "Adding house metadata: fca4f2d"
+```
+
+#### 4. Split back to Juliet repository (verona-juliet branch):
+```mermaid
+gitGraph
+    commit id: "Initial commit: 40840a7"
+    commit id: "Adding house metadata: 575b240"
+    commit id: "Fixing typo: c8891f4"
+```
+
+### Option 2: Combined Flow Diagram
+
+This shows the complete flow from individual repos → monorepo → split repos:
+
+```mermaid
+gitGraph
+    commit id: "romeo: a88073f"
+    branch juliet-main
+    checkout juliet-main
+    commit id: "juliet: 40840a7"
+    
+    checkout main
+    merge juliet-main id: "stitch: 39202c3"
+    commit id: "house: fa6e575"
+    commit id: "typo: ab98164"
+    
+    branch verona-romeo
+    checkout verona-romeo
+    commit id: "romeo base: a88073f"
+    commit id: "romeo house: fca4f2d"
+    
+    checkout main
+    branch verona-juliet  
+    checkout verona-juliet
+    commit id: "juliet base: 40840a7"
+    commit id: "juliet house: 575b240"
+    commit id: "juliet typo: c8891f4"
+```
