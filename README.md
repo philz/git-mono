@@ -18,13 +18,18 @@ Also, definitely vibe coded.
 In this example, Romeo and Juliet are our two repos, alike in dignity.
 
 ```
+# This just helps makes things deterministic for this example...
 $ export GIT_AUTHOR_NAME="Test User"
 $ export GIT_AUTHOR_EMAIL="test@example.com"
 $ export GIT_COMMITTER_NAME="Test User"
 $ export GIT_COMMITTER_EMAIL="test@example.com"
+
+# Initialize the repo with two remotes
 $ git init
 $ git remote add romeo https://github.com/philz/romeo.git
 $ git remote add juliet https://github.com/philz/juliet.git
+
+# Stitch them together!
 $ git-stitch romeo/main juliet/main
 Fetching romeo... romeo/main is a88073f262f07f76e367b6f2f7df2b0be13c6494
 Fetching juliet... juliet/main is 40840a7aa72be6ce82659a78d566d8598a845760
@@ -33,14 +38,20 @@ To check out the new commit, run:
   git checkout -b mono 39202c39c656d36ae47157766ef147328339abbf
 Or to update your current branch:
   git reset 39202c39c656d36ae47157766ef147328339abbf
+
+# Make some edits!
 $ echo "Caplet" >> juliet/house.txt
 $ echo "Romeo" >> romeo/house.txt
 $ git add juliet/house.txt romeo/house.txt
 $ GIT_AUTHOR_DATE="2024-01-01T00:00:00Z" GIT_COMMITTER_DATE="2024-01-01T00:00:00Z" git commit -m'Adding house metadata.'
 [mono fa6e575] Adding house metadata.
+
+# Fix the typo!
 $ echo "Capulet" > juliet/house.txt
 $ GIT_AUTHOR_DATE="2024-01-01T00:01:00Z" GIT_COMMITTER_DATE="2024-01-01T00:01:00Z" git commit -a -m'Fixing typo'
 [mono ab98164] Fixing typo
+
+# Rip them apart into two branches
 $ git-rip verona
 Found base commit: 39202c39c656d36ae47157766ef147328339abbf
 Processing commit: fa6e575d7268a98dae107e050edbef088787e014
@@ -56,7 +67,7 @@ Branches created:
 ## Installation
 
 ```
-go install github.com/philz/git-stitch/cmd/git-stitch github.com/philz/git-stitch/cmd/git-rip
+go install github.com/philz/git-stitch/cmd/git-stitch@latest github.com/philz/git-stitch/cmd/git-rip@latest
 ```
 
 ## Usage
@@ -105,7 +116,7 @@ config:
     showCommitLabel: true
     mainBranchName: 'romeo-repo'
     parallelCommits: true
-    rotateCommitLabel: false  
+    rotateCommitLabel: false
 ---
 gitGraph TB:
     branch juliet-repo
@@ -113,7 +124,7 @@ gitGraph TB:
 
     checkout romeo-repo
     commit id: "(romeo/main)"
-    
+
     checkout juliet-repo
     branch stitched
     %% mermaid doesn't really understand merges
@@ -135,7 +146,7 @@ gitGraph TB:
 If you prefer, here's the relevant equivalent with `git log`, slightly edited for clarity.
 
 ```
-$git log --graph --decorate --oneline HEAD rip-juliet rip-romeo 
+$git log --graph --decorate --oneline HEAD rip-juliet rip-romeo
 * b84f989 (HEAD) fixing typo
 * 189c64e Adding house metadata.
 *   b46a39a git-stitch merge
