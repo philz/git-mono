@@ -23,7 +23,20 @@ type CommitInfo struct {
 	CommitterTimestamp int64
 }
 
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
 func main() {
+	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
+		fmt.Printf("git-rip %s (%s, %s)\n", version, commit, date)
+		fmt.Printf("Splits monorepo commits back into separate repository branches.\n\n")
+		fmt.Printf("Usage: git-rip [prefix]\n")
+		fmt.Printf("\nIf no prefix is specified, 'rip-<timestamp>' is used.\n")
+		return
+	}
 	prefix := ""
 	if len(os.Args) > 1 {
 		prefix = os.Args[1]
