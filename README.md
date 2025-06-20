@@ -10,34 +10,38 @@ them up into commits that can be applied to the base repos.
 In this example, Romeo and Juliet are our two repos, alike in dignity.
 
 ```
-$ git remote add romeo git@github.com:philz/romeo.git
-$ git remote add juliet git@github.com:philz/juliet.git
+$ export GIT_AUTHOR_NAME="Test User"
+$ export GIT_AUTHOR_EMAIL="test@example.com"
+$ export GIT_COMMITTER_NAME="Test User"
+$ export GIT_COMMITTER_EMAIL="test@example.com"
+$ git remote add romeo https://github.com/philz/romeo.git
+$ git remote add juliet https://github.com/philz/juliet.git
 $ git-stitch romeo/main juliet/main
-Fetching romeo... romeo/main is aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-Fetching juliet... juliet/main is bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-Stitched romeo & juliet into cccccccccccccccccccccccccccccccccccccccc
+Fetching romeo... romeo/main is a88073f262f07f76e367b6f2f7df2b0be13c6494
+Fetching juliet... juliet/main is 40840a7aa72be6ce82659a78d566d8598a845760
+Stitched juliet & romeo into 39202c39c656d36ae47157766ef147328339abbf
 To check out the new commit, run:
-  git checkout -b mono cccccccccccccccccccccccccccccccccccccccc
+  git checkout -b mono 39202c39c656d36ae47157766ef147328339abbf
 Or to update your current branch:
-  git reset cccccccccccccccccccccccccccccccccccccccc
+  git reset 39202c39c656d36ae47157766ef147328339abbf
 $ echo "Caplet" >> juliet/house.txt
 $ echo "Romeo" >> romeo/house.txt
 $ git add juliet/house.txt romeo/house.txt
-$ git commit -a -m'Adding house metadata.'
-[main 63c67d03] Adding house metadata.
+$ GIT_AUTHOR_DATE="2024-01-01T00:00:00Z" GIT_COMMITTER_DATE="2024-01-01T00:00:00Z" git commit -m'Adding house metadata.'
+[mono fa6e575] Adding house metadata.
 $ echo "Capulet" > juliet/house.txt
-$ git commit -a -m'Fixing typo'
-[main 77777777] Adding house metadata.
+$ GIT_AUTHOR_DATE="2024-01-01T00:01:00Z" GIT_COMMITTER_DATE="2024-01-01T00:01:00Z" git commit -a -m'Fixing typo'
+[mono ab98164] Fixing typo
 $ git-rip verona
-Found base commit: cccccccccccccccccccccccccccccccccccccccc
-Processing commit: 63c67d03
-Created commit abcdef for romeo
-Created commit abc123 for juliet
-Processing commit: 7777777
-Created commit bcde12 for romeo
+Found base commit: 39202c39c656d36ae47157766ef147328339abbf
+Processing commit: fa6e575d7268a98dae107e050edbef088787e014
+Created commit 575b240b0efcbb8eb1d534cedeac4347839ea598 for juliet
+Created commit fca4f2d9e9bb9688f4c0178e0d401e03f87d5629 for romeo
+Processing commit: ab98164bf941ce213cd55022581a7501a3a16d27
+Created commit c8891f4f37d7953e28d671b5f4ed5f467465c5a6 for juliet
 Branches created:
-  romeo-verona
-  romeo-capulet
+  verona-juliet
+  verona-romeo
 ```
 
 ## Installation
@@ -45,6 +49,8 @@ Branches created:
 ```
 go install github.com/philz/git-stitch/cmd/git-stitch github.com/philz/git-stitch/cmd/git-rip
 ```
+
+
 
 ## Usage
 
@@ -81,5 +87,37 @@ See https://blog.philz.dev/blog/git-monorepo/
 
 ## What does this look like visually?
 
-TODO: Insert mermaid diagrams here of the merged romeo and juliet from above
-as well as the generated split commits.
+```mermaid
+---
+config:
+  gitGraph:
+    showBranches: true
+    showCommitLabel: true
+    mainBranchName: 'romeo-repo'
+    parallelCommits: true
+    rotateCommitLabel: false  
+---
+gitGraph TB:
+    branch juliet-repo
+    commit id: "(juliet/main)"
+
+    checkout romeo-repo
+    commit id: "(romeo/main)"
+    
+    checkout juliet-repo
+    branch stitched
+    %% mermaid doesn't really understand merges
+    %% unrelated roots, but this is ok...
+    merge romeo-repo id: "git-stitch merge" type: HIGHLIGHT tag: "git-stitch creates this"
+    commit id: "Adding house metadata"
+    commit id: "Fixing typo"
+
+    checkout romeo-repo
+    cherry-pick id: "Adding house metadata"
+
+    checkout juliet-repo
+    cherry-pick id: "Adding house metadata"
+
+    checkout juliet-repo
+    cherry-pick id: "Fixing typo"
+```
