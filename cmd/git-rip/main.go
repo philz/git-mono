@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -88,7 +89,7 @@ func main() {
 			if len(parts) == 2 {
 				remote := parts[0]
 				filePath := parts[1]
-				if contains(remotes, remote) {
+				if slices.Contains(remotes, remote) {
 					filesByRemote[remote] = append(filesByRemote[remote], filePath)
 				}
 			}
@@ -362,13 +363,4 @@ func createCommitForRemote(commit CommitInfo, remote string, files []string, par
 	}
 
 	return strings.TrimSpace(string(output)), nil
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }
