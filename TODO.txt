@@ -1,0 +1,11 @@
+# Error 1
+
+If the branch already exists, we fail. We should ask the user to delete the existing branch.
+
+$ git rip foo
+Branches created:
+	foo-juliet
+	foo-romeo
+$git rip foo
+Branches created:
+Error creating branch foo-juliet: exit status 128

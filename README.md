@@ -5,6 +5,14 @@ agent or a code search tool) can operate on them as one. `git-rip`
 takes any commits done on this combined repo, and splits
 them up into commits that can be applied to the base repos.
 
+## WARNING ⚠️
+
+This tool abuses some `git` features and functionalities and assumes
+some familiarity with fancy `git` footwork.
+Be careful!
+
+Also, definitely vibe coded.
+
 ## Usage Example
 
 In this example, Romeo and Juliet are our two repos, alike in dignity.
@@ -14,6 +22,7 @@ $ export GIT_AUTHOR_NAME="Test User"
 $ export GIT_AUTHOR_EMAIL="test@example.com"
 $ export GIT_COMMITTER_NAME="Test User"
 $ export GIT_COMMITTER_EMAIL="test@example.com"
+$ git init
 $ git remote add romeo https://github.com/philz/romeo.git
 $ git remote add juliet https://github.com/philz/juliet.git
 $ git-stitch romeo/main juliet/main
@@ -50,8 +59,6 @@ Branches created:
 go install github.com/philz/git-stitch/cmd/git-stitch github.com/philz/git-stitch/cmd/git-rip
 ```
 
-
-
 ## Usage
 
 ```
@@ -87,6 +94,9 @@ See https://blog.philz.dev/blog/git-monorepo/
 
 ## What does this look like visually?
 
+Mermaid doesn't like having merges between unrelated trees,
+but this is a fair representation.
+
 ```mermaid
 ---
 config:
@@ -121,3 +131,27 @@ gitGraph TB:
     checkout juliet-repo
     cherry-pick id: "Fixing typo"
 ```
+
+If you prefer, here's the relevant equivalent with `git log`, slightly edited for clarity.
+
+```
+$git log --graph --decorate --oneline HEAD rip-juliet rip-romeo 
+* b84f989 (HEAD) fixing typo
+* 189c64e Adding house metadata.
+*   b46a39a git-stitch merge
+|\
+| | * 6f15d97 (rip-juliet) fixing typo [cherry pick]
+| | * 31ace14 Adding house metadata. [cherry pick]
+| |/
+|/|
+* | 40840a7 (juliet/main) Initial commit
+ /
+| * 9ead60d (rip-romeo) Adding house metadata. [cherry pick]
+|/
+* a88073f (romeo/main) Initial commit
+```
+
+## How was this built?
+
+I used the PROMPT.txt in this repo to build the tool with [Sketch](https://sketch.dev).
+It took a few iterations of prompting, especially in fixing the `git-rip` command.

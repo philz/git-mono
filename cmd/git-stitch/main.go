@@ -63,9 +63,7 @@ func main() {
 		}
 
 		if !noFetch {
-			if os.Getenv("GIT_STITCH_VERBOSE") != "" {
-				fmt.Printf("Fetching %s... ", remote)
-			}
+			fmt.Printf("Fetching %s... ", remote)
 			cmd := exec.Command("git", "fetch", remote)
 			if err := cmd.Run(); err != nil {
 				fmt.Fprintf(os.Stderr, "Error fetching %s: %v\n", remote, err)
@@ -82,9 +80,7 @@ func main() {
 		}
 		commitHash := strings.TrimSpace(string(output))
 		remoteCommits[remote] = commitHash
-		if os.Getenv("GIT_STITCH_VERBOSE") != "" {
-			fmt.Printf("%s is %s\n", ref, commitHash)
-		}
+		fmt.Printf("%s is %s\n", ref, commitHash)
 
 		// Get the commit timestamp to find the maximum
 		cmd = exec.Command("git", "show", "-s", "--format=%ct", commitHash)
