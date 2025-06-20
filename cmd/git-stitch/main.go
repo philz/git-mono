@@ -1,6 +1,7 @@
 package main
 
 import (
+	"debug/buildinfo"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,15 +10,19 @@ import (
 	"strings"
 )
 
-var (
-	version = "dev"
-	commit  = "unknown"
-	date    = "unknown"
-)
+func getBuildInfo() string {
+	if info, err := buildinfo.ReadFile(os.Args[0]); err == nil {
+		if info.Main.Sum != "" {
+			return fmt.Sprintf("%s (%s)", info.Main.Version, info.Main.Sum)
+		}
+		return info.Main.Version
+	}
+	return "dev (unknown)"
+}
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "git-stitch %s (%s, %s)\n", version, commit, date)
+		fmt.Fprintf(os.Stderr, "git-stitch %s\n", getBuildInfo())
 		fmt.Fprintf(os.Stderr, "Combines multiple repositories into a monorepo structure.\n\n")
 		fmt.Fprintf(os.Stderr, "Usage: git-stitch [-no-fetch] ref1 [ref2...]\n")
 		os.Exit(1)

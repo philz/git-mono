@@ -57,16 +57,7 @@ go build ./cmd/git-stitch
 go build ./cmd/git-rip
 ```
 
-To build with version information:
-
-```bash
-VERSION=$(git describe --tags --always --dirty)
-COMMIT=$(git rev-parse HEAD)
-DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-go build -ldflags "-X main.version=$VERSION -X main.commit=$COMMIT -X main.date=$DATE" ./cmd/git-stitch
-go build -ldflags "-X main.version=$VERSION -X main.commit=$COMMIT -X main.date=$DATE" ./cmd/git-rip
-```
+Version information is automatically included using Go's build info.
 
 ## Usage
 

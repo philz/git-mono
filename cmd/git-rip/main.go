@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"debug/buildinfo"
 	"fmt"
 	"os"
 	"os/exec"
@@ -23,15 +24,19 @@ type CommitInfo struct {
 	CommitterTimestamp int64
 }
 
-var (
-	version = "dev"
-	commit  = "unknown"
-	date    = "unknown"
-)
+func getBuildInfo() string {
+	if info, err := buildinfo.ReadFile(os.Args[0]); err == nil {
+		if info.Main.Sum != "" {
+			return fmt.Sprintf("%s (%s)", info.Main.Version, info.Main.Sum)
+		}
+		return info.Main.Version
+	}
+	return "dev (unknown)"
+}
 
 func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
-		fmt.Printf("git-rip %s (%s, %s)\n", version, commit, date)
+		fmt.Printf("git-rip %s\n", getBuildInfo())
 		fmt.Printf("Splits monorepo commits back into separate repository branches.\n\n")
 		fmt.Printf("Usage: git-rip [prefix]\n")
 		fmt.Printf("\nIf no prefix is specified, 'rip-<timestamp>' is used.\n")
