@@ -10,6 +10,10 @@ them up into commits that can be applied to the base repos.
 In this example, Romeo and Juliet are our two repos, alike in dignity.
 
 ```
+$ export GIT_AUTHOR_NAME="Test User"
+$ export GIT_AUTHOR_EMAIL="test@example.com"
+$ export GIT_COMMITTER_NAME="Test User"
+$ export GIT_COMMITTER_EMAIL="test@example.com"
 $ git remote add romeo https://github.com/philz/romeo.git
 $ git remote add juliet https://github.com/philz/juliet.git
 $ git-stitch romeo/main juliet/main
@@ -23,10 +27,10 @@ Or to update your current branch:
 $ echo "Caplet" >> juliet/house.txt
 $ echo "Romeo" >> romeo/house.txt
 $ git add juliet/house.txt romeo/house.txt
-$ git commit -a -m'Adding house metadata.'
+$ GIT_AUTHOR_DATE="2024-01-01T00:00:00Z" GIT_COMMITTER_DATE="2024-01-01T00:00:00Z" git commit -m'Adding house metadata.'
 [mono fa6e575] Adding house metadata.
 $ echo "Capulet" > juliet/house.txt
-$ git commit -a -m'Fixing typo'
+$ GIT_AUTHOR_DATE="2024-01-01T00:01:00Z" GIT_COMMITTER_DATE="2024-01-01T00:01:00Z" git commit -a -m'Fixing typo'
 [mono ab98164] Fixing typo
 $ git-rip verona
 Found base commit: 39202c39c656d36ae47157766ef147328339abbf

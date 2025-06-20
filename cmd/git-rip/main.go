@@ -140,7 +140,6 @@ func findBaseMergeCommit() (string, error) {
 }
 
 func getCommitsSince(baseCommit string) ([]CommitInfo, error) {
-	// Use a simpler approach: get hashes first, then get details
 	cmd := exec.Command("git", "rev-list", "--reverse", fmt.Sprintf("%s..HEAD", baseCommit))
 	output, err := cmd.Output()
 	if err != nil {
@@ -166,8 +165,6 @@ func getCommitsSince(baseCommit string) ([]CommitInfo, error) {
 	return commits, nil
 }
 
-// getCommitInfo is no longer needed since getCommitsSince does this all at once
-// but keeping it for compatibility in case it's used elsewhere
 func getCommitInfo(hash string) (CommitInfo, error) {
 	cmd := exec.Command("git", "show", "-s", "--format=%H%x00%B%x00%an%x00%ae%x00%at%x00%cn%x00%ce%x00%ct", hash)
 	output, err := cmd.Output()
